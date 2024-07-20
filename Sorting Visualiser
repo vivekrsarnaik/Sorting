@@ -1,0 +1,210 @@
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import numpy as np
+
+# Function to generate data for sorting visualization
+def generate_data(n):
+    return np.random.randint(1, 100, n)
+
+# Bubble Sort visualization
+def bubble_sort_visualization(data):
+    n = len(data)
+    fig, ax = plt.subplots()
+    ax.set_title('Bubble Sort Visualization')
+    bar_rects = ax.bar(range(len(data)), data, align='edge')
+    iteration = [0]
+    
+    def update_fig(data, rects, iteration):
+        for rect, val in zip(rects, data):
+            rect.set_height(val)
+        iteration[0] += 1
+        ax.set_xlabel(f'Iterations: {iteration[0]}')
+    
+    anim = animation.FuncAnimation(fig, func=update_fig,
+                                   fargs=(bar_rects, iteration), frames=bubble_sort_generator(data),
+                                   repeat=False, blit=False, save_count=n**2)
+    
+    plt.show()
+
+def bubble_sort_generator(data):
+    n = len(data)
+    for i in range(n-1):
+        for j in range(n-i-1):
+            if data[j] > data[j+1]:
+                data[j], data[j+1] = data[j+1], data[j]
+                yield data.copy()
+
+# Selection Sort visualization
+def selection_sort_visualization(data):
+    n = len(data)
+    fig, ax = plt.subplots()
+    ax.set_title('Selection Sort Visualization')
+    bar_rects = ax.bar(range(len(data)), data, align='edge')
+    
+    iteration = [0]
+
+    def update_fig(data, rects, iteration):
+        for rect, val in zip(rects, data):
+            rect.set_height(val)
+        iteration[0] += 1
+        ax.set_xlabel(f'Iterations: {iteration[0]}')
+
+    anim = animation.FuncAnimation(fig, func=update_fig,
+                                   fargs=(bar_rects, iteration), frames=selection_sort_generator(data),
+                                   repeat=False, blit=False, save_count=n**2)
+
+    plt.show()
+
+def selection_sort_generator(data):
+    n = len(data)
+    for i in range(n-1):
+        min_index = i
+        for j in range(i+1, n):
+            if data[j] < data[min_index]:
+                min_index = j
+        if min_index != i:
+            data[i], data[min_index] = data[min_index], data[i]
+            yield data.copy()
+
+# Insertion Sort visualization
+def insertion_sort_visualization(data):
+    n = len(data)
+    fig, ax = plt.subplots()
+    ax.set_title('Insertion Sort Visualization')
+    bar_rects = ax.bar(range(len(data)), data, align='edge')
+    
+    iteration = [0]
+
+    def update_fig(data, rects, iteration):
+        for rect, val in zip(rects, data):
+            rect.set_height(val)
+        iteration[0] += 1
+        ax.set_xlabel(f'Iterations: {iteration[0]}')
+
+    anim = animation.FuncAnimation(fig, func=update_fig,
+                                   fargs=(bar_rects, iteration), frames=insertion_sort_generator(data),
+                                   repeat=False, blit=False, save_count=n**2)
+
+    plt.show()
+
+def insertion_sort_generator(data):
+    n = len(data)
+    for i in range(1, n):
+        key = data[i]
+        j = i - 1
+        while j >= 0 and key < data[j]:
+            data[j + 1] = data[j]
+            j -= 1
+        data[j + 1] = key
+        yield data.copy()
+
+# Merge Sort visualization
+def merge_sort_visualization(data):
+    def merge_sort(data, left, right):
+        if left < right:
+            mid = (left + right) // 2
+            yield from merge_sort(data, left, mid)
+            yield from merge_sort(data, mid + 1, right)
+            yield from merge(data, left, mid, right)
+
+    def merge(data, left, mid, right):
+        left_copy = data[left:mid + 1]
+        right_copy = data[mid + 1:right + 1]
+        
+        left_index = right_index = 0
+        sorted_index = left
+        
+        while left_index < len(left_copy) and right_index < len(right_copy):
+            if left_copy[left_index] <= right_copy[right_index]:
+                data[sorted_index] = left_copy[left_index]
+                left_index += 1
+            else:
+                data[sorted_index] = right_copy[right_index]
+                right_index += 1
+            sorted_index += 1
+            
+            yield data.copy()
+        
+        while left_index < len(left_copy):
+            data[sorted_index] = left_copy[left_index]
+            left_index += 1
+            sorted_index += 1
+            yield data.copy()
+        
+        while right_index < len(right_copy):
+            data[sorted_index] = right_copy[right_index]
+            right_index += 1
+            sorted_index += 1
+            yield data.copy()
+
+    n = len(data)
+    fig, ax = plt.subplots()
+    ax.set_title('Merge Sort Visualization')
+    bar_rects = ax.bar(range(len(data)), data, align='edge')
+    
+    iteration = [0]
+
+    def update_fig(data, rects, iteration):
+        for rect, val in zip(rects, data):
+            rect.set_height(val)
+        iteration[0] += 1
+        ax.set_xlabel(f'Iterations: {iteration[0]}')
+
+    anim = animation.FuncAnimation(fig, func=update_fig,
+                                   fargs=(bar_rects, iteration), frames=merge_sort(data, 0, n - 1),
+                                   repeat=False, blit=False, save_count=n**2)
+
+    plt.show()
+
+# Quick Sort visualization
+def quick_sort_visualization(data):
+    def quick_sort(data, low, high):
+        if low < high:
+            pivot_idx = partition(data, low, high)
+            yield from quick_sort(data, low, pivot_idx - 1)
+            yield from quick_sort(data, pivot_idx + 1, high)
+    
+    def partition(data, low, high):
+        pivot = data[high]
+        i = low - 1
+        for j in range(low, high):
+            if data[j] <= pivot:
+                i += 1
+                data[i], data[j] = data[j], data[i]
+                yield data.copy()
+        data[i + 1], data[high] = data[high], data[i + 1]
+        yield data.copy()
+        return i + 1
+    
+    n = len(data)
+    fig, ax = plt.subplots()
+    ax.set_title('Quick Sort Visualization')
+    bar_rects = ax.bar(range(len(data)), data, align='edge')
+    
+    iteration = [0]
+
+    def update_fig(data, rects, iteration):
+        for rect, val in zip(rects, data):
+            rect.set_height(val)
+        iteration[0] += 1
+        ax.set_xlabel(f'Iterations: {iteration[0]}')
+
+    anim = animation.FuncAnimation(fig, func=update_fig,
+                                   fargs=(bar_rects, iteration), frames=quick_sort(data, 0, n - 1),
+                                   repeat=False, blit=False, save_count=n**2)
+
+    plt.show()
+
+# Main function for demonstrating sorting visualizations
+if __name__ == "__main__":
+    data = generate_data(20)  # Generate random data for visualization
+    print("Original Data:", data)
+    
+    # Call each sorting visualization function
+    bubble_sort_visualization(data.copy())
+    selection_sort_visualization(data.copy())
+    insertion_sort_visualization(data.copy())
+    merge_sort_visualization(data.copy())
+    quick_sort_visualization(data.copy())
+    
+    print("Sorted Data:", data)
